@@ -1,0 +1,357 @@
+import telebot
+from telebot import types
+import time
+import random
+from urllib.parse import urlencode
+
+bot = telebot.TeleBot('6657945730:AAFaPRDali0Dx_GRgqI0oNzYUostw-cA7Sc')
+
+#переменная для названия группы пользователя
+gruppa = ''
+
+#переменная для названия высшей школы
+hs = ''
+
+#переменная для ссылки на расписание пользователя
+link = ''
+
+#фразы для фунцкии Помоги
+phrases = ['Чем я могу помочь', 'Что случилось', 'Я готов помогать', 'Бот РЭУ на проводе', 'Давай размеремся вместе', 'Режим помогатор: ON', 'Слушаю', 'Плехбот готов к работе', 'Весь во внимании', 'Да-да', 'На проводе']
+
+#словарь ответов на брань
+dict_bad = {
+    1:'Я хоть и бот и дирекции ничего не расскажу, но ругаться все равно не надо',
+    2:'Брань здесь явно лишнее',
+    3:'Отправил твое сообщение в дирекцию)\nШучу, но больше не пиши так',
+    4:'Главное с преподавателями так не общайся, да и вообще это лишнее',
+    5:'Кто ругается, у того сессия не закрывается',
+    6:'Представим, что я этого не видел...',
+    7:'На словах ты Лев Толстой, а на деле...',
+    8:'Ок.'
+}
+#словарь с почтами всех преподавателей университета
+dict_mails = {
+    'Коньков Михаил Николаевич':['Konkov.MN@rea.ru','его'],
+    'Мирзаханян Рузана Эдуардовна':['Mirzakhanyan.RE@rea.ru','её'],
+    'Асатрян Георгий Эминович':['g.orientalist@mail.ru','его'],
+    'Козлова Ирина Владимировна':['','её'],
+    'Тельнова Мария Юрьевна':['mytelnova@yandex.ru','её'],
+    'Мамин Эльдар Алиевич':['yeldar443@mail.ru','его'],
+    'Иксанов Владислав Рашидович':['iksanov.vr@rea.ru','его'],
+    'Ростеванов Александр Георгиевич':['','его'],
+    'Семина Вера Викторовна':['','её'],
+    'Зенина Людмила Владимировна':['','её'],
+    'Черноусов Андрей Анатольевич':['','его'],
+    'Дандамаева Загида Эфендиевна':['zagida1979@yandex.ru','её'],
+    'Козырев Андрей Владимирович':['','его'],
+    'Чекмарев Эдуард Владимирович':['CHekmarev.EV@rea.ru','его'],
+    'Фесянова Оксана Алексеевна':['fesyanova.oa@rea.ru','её'],
+}
+
+#словарь информации о корпусах
+dict_korp = {
+    '1k':'empty',
+    '2k':'empty',
+    '3k':'<u>1ый этаж: </u>Раздевалка, Банкоматы, Уличная веранда\n<u>2ой этаж:</u> Копировальный центр\n<u>3ий этаж:</u> Большое шахматное поле(над уличной верандой), ',
+    '4k':'empty',
+    '5k':'empty',
+    '6k':'<u>1ый этаж:</u> \n<u>2ой этаж:</u> Небольшая закусочная, ДоброЦентр(зона коворкинга или просто мягкие пуфики), Библиотека(здесь ты можешь как взять книги, так и поработать в тишине)\n<u>3ий этаж:</u> \n<u>4ый этаж:</u> ',
+    '7k':'empty',
+    '8k':'empty'
+}
+
+#словарь с местами рядом с рэу
+dict_places = {
+    'Еда':'1.Vua Food Hall(сказочная шаурма)\n2.Ракета\n3.Суши лайк\n4.Fаrш\nVabene(пицца)\n5.Hite\n6.Nagoya\n7.Бургер Кинг\n8.Вкусно и точка(долго ждать)\n9.Кофемания\n10.Му-Му',
+    'Магазины':'1.Пятерочка\n2.Перекресток',
+    'Аптеки':'1.Ригла\n2.Мелодия здоровья',
+    'Кофейни':'1. Cofix\n2. Surf Coffe\n3. One price coffe\n4. SeDelice\n5. Правда кофе\n6. Братья караваевы\n7. Вкус кофе\n8. Finch\n9. Rockets',
+    'Остальное':'1.Копирка\n2.Тинькофф банкомат'
+}
+
+#photos open
+ph_cof = open(r'C:\Users\Professional\Desktop\дикие фото\bot\Кофейни.png', 'rb')
+dict_photo = {
+    'Еда':'',
+    'Магазины':'',
+    'Аптеки':'',
+    'Кофейни':ph_cof,
+    'Остальное':''
+}
+
+#начало работы, старт + ссылка на сайт университета
+@bot.message_handler(commands = ['start'])
+def main(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('Сайт нашего университета', url='https://www.xn--p1ag3a.xn--p1ai/'))
+    bot.send_message(message.chat.id, '<a href="https://telegra.ph/Test-statya-11-22">наш канал</a>', parse_mode='html')
+    bot.send_message(message.chat.id, 'секрет тут ||ыыы||', parse_mode='MarkdownV2')
+    bot.send_message(message.chat.id, f'Привет, {message.chat.first_name}. Я бот университета <b>РЭУ им. Плеханова</b>. Я стараюсь помогать всем нашим студентам. Ты всегда можешь обратится ко мне за помощью. А чтобы узнать, что я умею, просто используй команду /help', parse_mode='html', reply_markup=markup)
+
+
+#возможности бота + запрос группы пользователя
+@bot.message_handler(commands=['help'])
+def main(message):
+    markup = types.ReplyKeyboardMarkup()
+    b1 = types.KeyboardButton('Форсайт')
+    b2 = types.KeyboardButton('ВШЭиБ')
+    b3 = types.KeyboardButton('ВШФ')
+    b4 = types.KeyboardButton('ВИШ НМиТ')
+    b5 = types.KeyboardButton('ВШСГН')
+    b6 = types.KeyboardButton('ВШКМиС')
+    b7 = types.KeyboardButton('ВШМ')
+    b8 = types.KeyboardButton('ВШКИ')
+    b9 = types.KeyboardButton('ИПАМ')
+    b10 = types.KeyboardButton('ВШП')
+    b11 = types.KeyboardButton('ВШМиП')
+    b12 = types.KeyboardButton('Капитаны')
+    b13 = types.KeyboardButton('Интеграл')
+    markup.row(b1, b2, b3)
+    markup.row(b4, b5, b6)
+    markup.row(b7, b8, b9)
+    markup.row(b10, b11, b12)
+    markup.row(b13)
+    bot.send_message(message.chat.id, '<b>Итак, вот список моих возможностей:</b>\n1. Ты можешь получить корпоративную почту любого преподавателя\n2. Ты можешь узнать расписание конкретной группы(в том числе и совей), а также узнать, какие аудитории свободны в данный момент\n3. Я могу рассказать тебе о всех важных и полезных местах, которые находятся рядом с нашим университетом\n4. Я могу рассказать тебе о необычных местах в самом университете, где можно провести время\n5. Я могу поделиться с тобой интересными и важными группами ВК, связанными с нашим университетом\nДля быстрого доступа к моим возможностям ты всегда можешь написать мне: "помоги" или нажать соответствующую кнопку', parse_mode='html')
+    time.sleep(3)
+    bot.send_message(message.chat.id, 'Но для начала расскажи мне немного о себе, чтобы мне было легче помогать тебе)')
+    bot.send_message(message.chat.id, "Выбери в списке свой факультет", reply_markup=markup)
+    bot.register_next_step_handler(message, sch)
+
+
+
+#функция для записи группы пользователя+создание ссылки на расписание
+def group(message):
+    global gruppa
+    global link
+    gruppa = message.text.lower()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    if gruppa[2] == '.' and '-' in gruppa and gruppa[-4] == '/':
+        bot.send_message(message.chat.id, "Информация записана, теперь ты можешь спокойно пользоваться мной, нажав на кнопку <b>Помоги</b>", reply_markup=markup, parse_mode='html')
+    else:
+        bot.send_message(message.chat.id,'Неверный формат, попробуйте еще раз\nПример - <b>15.27Д-ИБ01/23б</b>', parse_mode='html')
+        bot.register_next_step_handler(message, group)
+    link = 'https://rasp.rea.ru/?' + urlencode({'q':gruppa})
+
+
+#функция для выбора высшей школы пользователя
+def sch(message):
+    hideBoard = types.ReplyKeyboardRemove()
+    global hs
+    hs = message.text
+    bot.send_message(message.chat.id, 'Также напиши, пожалуйста, полное название своей группы обучения', reply_markup=hideBoard)
+    bot.register_next_step_handler(message, group)
+
+
+
+#вызов бота с функцией вывода кнопок-команд
+@bot.message_handler()
+def func(message):
+    if 'омоги' in message.text:
+        markup = types.ReplyKeyboardMarkup()
+        btn_mail = types.KeyboardButton("Почты преподавателей")
+        btn_sced = types.KeyboardButton("Расписание")
+        btn_map_out = types.KeyboardButton("Места рядом с РЭУ")
+        btn_map_inside = types.KeyboardButton("Места в РЭУ")
+        btn_vk = types.KeyboardButton("Полезные ссылки")
+        btn_note = types.KeyboardButton("Моя группа")
+        markup.add(btn_mail, btn_sced, btn_map_out, btn_map_inside, btn_vk)
+        markup.row(btn_note)
+        bot.send_message(message.chat.id, phrases[random.randint(0,len(phrases)-1)], reply_markup=markup)
+        bot.register_next_step_handler(message, click)
+
+    if any(['ривет' in message.text, 'дорова' in message.text, 'дравствуй' in message.text]):
+        bot.send_message(message.chat.id, "Привет еще раз!\nЧтобы начать мною пользоваться, просто нажми сюда -> /help")
+
+    if any(['хуй' in message.text, 'изда' in message.text,'овно' in message.text, 'бля' in message.text, 'Хуй' in message.text, 'соси' in message.text, 'ебал' in message.text]):
+        bot.send_message(message.chat.id, dict_bad[random.randint(1,8)])
+#фунцкия нажатия на кнопки-команды
+@bot.message_handler()
+def click(message):
+    #кнопка Помоги
+    markup_help = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup_help.add(btn_help)
+    #кнопки для расписания
+    markup = types.ReplyKeyboardMarkup()
+    b1 = types.KeyboardButton('Мое расписание')
+    b2 = types.KeyboardButton('Расписание другой группы')
+    b3 = types.KeyboardButton('Свободные аудитории')
+    markup.row(b1)
+    markup.row(b2,b3)
+
+    #кнопки для ссылок
+    markupl = types.ReplyKeyboardMarkup()
+    b_ab = types.KeyboardButton(f"Группа для абитуриентов {hs}")
+    b_ss = types.KeyboardButton(f"Группа студенческого совета {hs}")
+    b_hs = types.KeyboardButton(f"Группа {hs}")
+    markupl.row(b_hs,b_ss)
+    markupl.row(b_ab)
+
+    #кнопки для выбора корпуса
+    markup_korp = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    bt1 = types.KeyboardButton("1k")
+    bt2 = types.KeyboardButton("2k")
+    bt3 = types.KeyboardButton("3k")
+    bt4 = types.KeyboardButton("4k")
+    bt5 = types.KeyboardButton("5k")
+    bt6 = types.KeyboardButton("6k")
+    bt7 = types.KeyboardButton("7k")
+    bt8 = types.KeyboardButton("8k")
+    markup_korp.add(bt1, bt2, bt3, bt4, bt5, bt6, bt7, bt8)
+
+    #кнопки для мест рядом с рэу
+    markup_places = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btf = types.KeyboardButton("Еда")
+    btsh = types.KeyboardButton("Магазины")
+    btmed = types.KeyboardButton("Аптеки")
+    btc = types.KeyboardButton("Кофейни")
+    btot = types.KeyboardButton("Остальное")
+    markup_places.row(btf,btsh)
+    markup_places.row(btmed,btc, btot)
+
+    #удаление лишних кнопок
+    hideBoard = types.ReplyKeyboardRemove()
+    if message.text == 'Почты преподавателей':
+        bot.send_message(message.chat.id, 'Введи ФИО преподавателя', reply_markup=hideBoard)
+        bot.register_next_step_handler(message, mail)
+    elif message.text == 'Расписание':
+        bot.send_message(message.chat.id, "Что ты хочешь узнать про расписание?", reply_markup=markup)
+        bot.register_next_step_handler(message, sced)
+    elif message.text == 'Места рядом с РЭУ':
+        bot.send_message(message.chat.id, 'Какие места тебя интересуют?', reply_markup=markup_places)
+        bot.register_next_step_handler(message, places)
+    elif message.text == 'Места в РЭУ':
+        bot.send_message(message.chat.id, "Какой корпус тебя интересует?", reply_markup=markup_korp)
+        bot.register_next_step_handler(message, corp_describe)
+    elif message.text == 'Полезные ссылки':
+        bot.send_message(message.chat.id, "Что именно тебя интересует?", reply_markup=markupl)
+        bot.register_next_step_handler(message, use_links)
+    elif message.text == 'Моя группа':
+        bot.send_message(message.chat.id, f"<b>Напоминалочка</b>\n{gruppa}", parse_mode='html', reply_markup=markup_help)
+
+
+#ссылки на группы рэу в вк
+def use_links(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    #ссылки на студ советы
+    if 'совета' in message.text:
+        if hs == 'ВШКМиС':
+            bot.send_message(message.chat.id, 'https://vk.com/hscms?trackcode=2c7b68bfES3zdxVKmBGftZG8cvk5t-KQb4FtIOF1egno5pd5caKcTGDVpg72aIi9irNB5DuL4IRvkGcu6W5gDOXAvmRjqcpKa7jWZw', reply_markup=markup)
+        elif hs == 'ВШЭиБ':
+            bot.send_message(message.chat.id, 'https://vk.com/abiturient_hseb?trackcode=92345232CBTopJ-9X_YisC4u85PF9RbCAC_D-zAfuSiohlUNnXs',  reply_markup=markup)
+        elif hs == 'ИПАМ':
+            bot.send_message(message.chat.id, 'https://vk.com/ssovet_academy.media?trackcode=c81d65825Swlt3-2UNqTGhIWdzrvAP8ZLHvsCV7BPyoComcpkvQ',  reply_markup=markup)
+        elif hs == 'ВШМ':
+            bot.send_message(message.chat.id, 'https://vk.com/hsmanegement?trackcode=a86fed42P_cE3AO8DTm2M9PXlVv7O00zDX5K2KKfki2RTwJXGmY',  reply_markup=markup)
+        elif hs == 'ВШСГН':
+            bot.send_message(message.chat.id, 'https://vk.com/ssovet_hsssh?trackcode=145d5249iV4yHzX2NiuFhEcKNrdTmjkZKo3KFNrIOvOLgMhfcJw',  reply_markup=markup)
+        elif hs == 'ВШКИ':
+            bot.send_message(message.chat.id, 'https://vk.com/hscireu?trackcode=abdd8b47sjUm0paJiQyEv1Cjv_lFvsyt6HpL28DHOqjVPFuUKpU',  reply_markup=markup)
+        elif hs == 'Форсайт':
+            bot.send_message(message.chat.id, 'https://vk.com/sovet_foresight?trackcode=9f07a168sMtmN7YECS42JgrXf73QuWdrONBvOLRQwU8k2yt3wi4',  reply_markup=markup)
+        elif hs == 'ВШП':
+            bot.send_message(message.chat.id, 'https://vk.com/hsl_sovet?trackcode=f1c6ec511-v9m5c2jRmm6c5ZWmJ4JQY4gAveKwmahrlHwDAkvEA',  reply_markup=markup)
+        elif hs == 'Интеграл':
+            bot.send_message(message.chat.id, 'https://vk.com/integralsovet?trackcode=f7d5248cjSpPULYMQ0k3gIMwtcK38pH6E1Z6wz_SWubl5tooVNE',  reply_markup=markup)
+        elif hs == 'Капитаны':
+            bot.send_message(message.chat.id, 'https://vk.com/captains_students?trackcode=80eb003cKMzqm3iC7YvZqwtSfF1OrPtVuSY7iKkgyg52b3M0KFw',  reply_markup=markup)
+        elif hs == 'ВИШ НМиТ':
+            bot.send_message(message.chat.id, 'У этого факультета нет группы студенческого совета(',  reply_markup=markup)
+
+    #ссылки на группы абитуриентов
+    elif 'абитуриентов' in message.text:
+        if hs == 'ВШКМиС':
+            bot.send_message(message.chat.id,'https://vk.com/abi_hscms?trackcode=f8a09dafAV3ZBxRPUeJRqh5dZZJ2sLXaJnIX3-cZBO5fJI17ypy1PATr0BU9m0aiBVJWnH2Dh8AWfBXH5AUe7k4u0g-r',reply_markup=markup)
+        elif hs == 'ВШФ':
+            bot.send_message(message.chat.id,'https://vk.com/abitureu_hsf?trackcode=5fdf139dS7z5ACR4sel7yUPDBIJLNRlMXkDLwO_8UmV1mpw3Jn4', reply_markup=markup)
+        elif hs == 'ВШЭиБ':
+            bot.send_message(message.chat.id, 'https://vk.com/abiturient_hseb?trackcode=acc1b96exErQoJGRvO2MMG_Y1hwgac8y68V-jsmsibpVSvhXAC0', reply_markup=markup)
+        elif hs == 'ИПАМ':
+            bot.send_message(message.chat.id,'К сожалению, информация отсутствует',reply_markup=markup)
+        elif hs == 'ВШМ':
+            bot.send_message(message.chat.id,'https://vk.com/abiturienthsm?trackcode=9855b2c4Y_3vFXo0gIOvGpoSB_GyB-gURjdeg_63N2Hfb7ry-gI',reply_markup=markup)
+        elif hs == 'ВШСГН':
+            bot.send_message(message.chat.id,'https://vk.com/abiturienthsssh?trackcode=b3686cedIsiVMSLxs4JmfqVnFDRyr63rl17O_tCRwHMR-yoW-_Q',reply_markup=markup)
+        elif hs == 'ВШКИ':
+            bot.send_message(message.chat.id,'https://vk.com/abiturient_hsci?trackcode=38800e73JneYKYwZ7qTSUYM9g4YhD03UgkbHjgdB_j6XU3fLQNU',reply_markup=markup)
+        elif hs == 'Форсайт':
+            bot.send_message(message.chat.id,'https://vk.com/abiturientfforsait?trackcode=ae360d459DcvToJIMcQGKbhkewz1Uu7oAqn66ST-T94e9WTvTWk',reply_markup=markup)
+        elif hs == 'ВШП':
+            bot.send_message(message.chat.id,'https://vk.com/abihsl?trackcode=aa5a88efzezMngHBYbI5-iCEraEqc8AGOpYmnhrL0ESayJWyNjs',reply_markup=markup)
+        elif hs == 'Интеграл':
+            bot.send_message(message.chat.id,'https://vk.com/integral_abitur?trackcode=70d3f1db0j1_avtzF_XnbiIuabcP45unlS13G_QRUQgglewqciw',reply_markup=markup)
+        elif hs == 'Капитаны':
+            bot.send_message(message.chat.id,'https://vk.com/abiturient_captains?trackcode=bc65d5fdJltsmu0mXBCOgbPlSrEQvwVSQACD0_I9KLyyx_Saw7U',reply_markup=markup)
+        elif hs == 'ВИШ НМиТ':
+            bot.send_message(message.chat.id,'https://vk.com/abiturientvishnmit?trackcode=4c1be88775TjS437JEUB93X_duYEzjfHoXSqakcvPX4ferX3sak', reply_markup=markup)
+
+    #ссылки на группы факультетов
+    else:
+        if hs == 'ВШКМиС':
+            bot.send_message(message.chat.id, 'https://vk.com/hscms_reu?trackcode=7b4ddb76QeNvzuwbOW3M3O-qyEgXqYIAL0C-ojW627UrPEDmmcPMgvpYF2lWFNvU9KX7VRWVgBQvUbSsPaHBsCYaafuLyJqE8TVnAA', reply_markup=markup)
+        elif hs == 'ВШФ':
+            bot.send_message(message.chat.id, 'https://vk.com/hsfreu?trackcode=905f0bc5g6btFHGe8CrhIEcvUdAit_2bJMV9BcZu5JTzNtD6-zA', reply_markup=markup)
+        elif hs == 'ВШЭиБ':
+            bot.send_message(message.chat.id, 'К сожалению, информация отсутствует',  reply_markup=markup)
+        elif hs == 'ИПАМ':
+            bot.send_message(message.chat.id, 'https://vk.com/academy.media?trackcode=73a021a6jfTDkTxOKj5QePjKCsCiMa2t1ks1Ed81OTxtykDJYyU',  reply_markup=markup)
+        elif hs == 'ВШМ':
+            bot.send_message(message.chat.id, 'https://vk.com/highschool_management?trackcode=3ddaeb142piFijID_ueuyGAEREUG73mIoSAis9DqTV9_VcHX',  reply_markup=markup)
+        elif hs == 'ВШСГН':
+            bot.send_message(message.chat.id, 'https://vk.com/vshsgn?trackcode=b0b2e0c8feRbM07zn-zOtMGfXghNmLZldZW7d3gvXOqqioDCiJ4',  reply_markup=markup)
+        elif hs == 'ВШКИ':
+            bot.send_message(message.chat.id, 'https://vk.com/hscireu?trackcode=abdd8b47sjUm0paJiQyEv1Cjv_lFvsyt6HpL28DHOqjVPFuUKpU',  reply_markup=markup)
+        elif hs == 'Форсайт':
+            bot.send_message(message.chat.id, 'https://vk.com/fforsait?trackcode=af8ddceaTdQQD-QGEeL1_hbN3ZjBi9L0urVBANpS_dgZZ6Y_mY0',  reply_markup=markup)
+        elif hs == 'ВШП':
+            bot.send_message(message.chat.id, 'https://vk.com/reu_hsl?trackcode=ac23f5e9sdAUk868ZQdblInBQAhem2XRqAxTTIir1dzuVl6Z',  reply_markup=markup)
+        elif hs == 'Интеграл':
+            bot.send_message(message.chat.id, 'https://vk.com/integralrea?trackcode=41b3478eNyGHRZOMmRrlhq0A2syvsKYJVvDVrwUduogFYzGzSgw',  reply_markup=markup)
+        elif hs == 'Капитаны':
+            bot.send_message(message.chat.id, 'https://vk.com/captains_russia?trackcode=aa4340f4F8ilDKDj41FU4zrrN_Uz0PdrtuGoah4cYumWk3HGgso',  reply_markup=markup)
+        elif hs == 'ВИШ НМиТ':
+            bot.send_message(message.chat.id, 'https://vk.com/vishnmit?trackcode=163f18ae0WbJceNs5U3qAGd1ydpPUgMxlR2-c0V_86x51Aw48g4',  reply_markup=markup)
+
+#получение имени преподавателя -> вывод почты преподавателя
+def mail(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    name = message.text
+    bot.send_message(message.chat.id, f"Вот {dict_mails[name][1]} почта: " + dict_mails[name][0],reply_markup=markup)
+
+#блок расписания
+def sced(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    if message.text == "Мое расписание":
+        bot.send_message(message.chat.id, link, reply_markup=markup)
+    elif message.text == 'Расписание другой группы':
+        bot.send_message(message.chat.id, 'Введи название интересующей группы')
+        bot.register_next_step_handler(message, other)
+
+#получение названия другой группы и передача ссылки на ее расписание
+def other(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    bot.send_message(message.chat.id, 'https://rasp.rea.ru/?' + urlencode({'q': message.text.lower()}), reply_markup=markup)
+
+#описание корпусов
+def corp_describe(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    bot.send_message(message.chat.id, f"<b>Информация о {message.text}</b>\n{dict_korp[message.text]}", reply_markup=markup, parse_mode='html')
+
+def places(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_help = types.KeyboardButton("Помоги")
+    markup.add(btn_help)
+    bot.send_photo(message.chat.id, dict_photo[message.text], f"<b>{message.text}</b>\n{dict_places[message.text]}", reply_markup=markup, parse_mode='html')
+bot.polling(none_stop = True)
